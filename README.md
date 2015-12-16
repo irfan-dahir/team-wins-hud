@@ -1,11 +1,10 @@
 # Team Wins HUD  (version 0.1) #
 
 A pretty cool HUD.
-Read more [here]()
+Read more [here](http://www.unrealsoftware.de/files_show.php?file=16778)
 
 ### Features ###
 
-* Noob Friendly
 * Completely customizable
 * Theme-able
 * Basic Fade/Slide - In/Out animations for the HUD

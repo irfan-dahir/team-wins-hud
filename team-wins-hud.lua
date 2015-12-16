@@ -174,16 +174,14 @@ teamStats.UI.ct = teamStats.initArray(teamStats.UI.ct, 100)
 teamStats.UI.tt = teamStats.initArray(teamStats.UI.tt, 100)
 
 teamStats.vars = {
-	tt = 5,
-	ct = 5,
+	tt = 0,
+	ct = 0,
 	ct_percentile = 0,
 	tt_percentile = 0,
 	round = 0,
 	showTimeCount = 0,
 }
 
-print('Initialized Team Win HUD v'..teamStats.version)
-print('Developed by '..teamStats.author..' [#116310]')
 
 --[[
 	Hook Calls
