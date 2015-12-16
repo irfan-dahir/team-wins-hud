@@ -304,6 +304,7 @@ end
 
 function teamStats.roundend(mode)
 	if teamStats.config.roundLimit > 0 then
+		teamStats.vars.round = teamStats.vars.round + 1
 		if mode == 1 or mode == 20 then
 			if teamStats.vars.round <= teamStats.config.roundLimit then
 				teamStats.vars.tt = teamStats.vars.tt + 1
