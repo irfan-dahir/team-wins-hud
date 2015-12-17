@@ -249,11 +249,6 @@ function teamStats.second()
 end
 
 function teamStats.render()
-print('round: '..teamStats.vars.round)
-print('ct: '..teamStats.vars.ct)
-print('tt: '..teamStats.vars.tt)
-print('ct percentile: '..teamStats.vars.ct_percentile)
-print('tt percentile: '..teamStats.vars.tt_percentile)
 	if teamStats.vars.resetCall then
 		teamStats.reset()
 		teamStats.free()
@@ -324,20 +319,17 @@ end
 
 function teamStats.roundend(mode)
 	if teamStats.config.roundLimit > 0 then
-		print('LIMITED ROUNDS MODE')
 		teamStats.vars.round = teamStats.vars.round + 1
 		if teamStats.vars.round <= teamStats.config.roundLimit then
 			for _,gm in pairs(teamStats.const.gameModes.ct) do
 				if gm == mode then
 					teamStats.vars.ct = teamStats.vars.ct + 1
-					print('CT++')
 					break
 				end
 			end
 			for _,gm in pairs(teamStats.const.gameModes.tt) do
 				if gm == mode then
 					teamStats.vars.tt = teamStats.vars.tt + 1
-					print('TT++')
 					break
 				end
 			end
@@ -347,14 +339,12 @@ function teamStats.roundend(mode)
 		for _,gm in pairs(teamStats.const.gameModes.ct) do
 			if gm == mode then
 				teamStats.vars.ct = teamStats.vars.ct + 1
-				print('CT++')
 				break
 			end
 		end
 		for _,gm in pairs(teamStats.const.gameModes.tt) do
 			if gm == mode then
 				teamStats.vars.tt = teamStats.vars.tt + 1
-				print('TT++')
 				break
 			end
 		end
@@ -369,7 +359,6 @@ end
 	Module Functions
 ]]
 function teamStats.reset()
-	print('Reset!')
 	teamStats.vars.ct = 0
 	teamStats.vars.tt = 0
 	teamStats.vars.ct_percentile = 0
