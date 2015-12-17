@@ -1,6 +1,6 @@
 if teamStats == nil then teamStats = {} end
 teamStats.author = "Nighthawk"
-teamStats.version = "0.1"
+teamStats.version = "0.2"
 function teamStats.initArray(table,index) local arr = table if type(table) == "table" then arr = {} end for i=1,index do arr[i] = 0 end return arr end
 
 --[[
@@ -34,7 +34,7 @@ teamStats.config = {
 		The team win stats will reset count after x rounds. If you don't want it to reset then set it as 0;
 			roundLimit = 0
 	]]
-	roundLimit = 100, --rounds
+	roundLimit = 3, --rounds
 	--[[
 		The positions are completely customizable.
 	]]
@@ -43,18 +43,18 @@ teamStats.config = {
 			src = "gfx/teamwinhud/bg.png",
 			x = 330,
 			y = 75,
-			alpha = 0.75, -- 0.0 - 1.0
+			alpha = 0.8, -- 0.0 - 1.0
 		},
 		shade = {
 			show = true,
 			src = "gfx/teamwinhud/shade.png",
 			x = 330,
 			y = 75,
-			alpha = 0.75, -- 0.0 - 1.0
+			alpha = 0.8, -- 0.0 - 1.0
 		},
 		ct_bar = {
 			src = "gfx/teamwinhud/ct.png",
-			alpha = 0.75, -- 0.0 - 1.0
+			alpha = 0.9, -- 0.0 - 1.0
 			--[[
 				Do not tweak this unless you know what you're doing
 				start_x is where the FIRST rendered block lies
@@ -69,7 +69,7 @@ teamStats.config = {
 		},
 		tt_bar = {
 			src = "gfx/teamwinhud/tt.png",
-			alpha = 0.75, -- 0.0 - 1.0
+			alpha = 0.9, -- 0.0 - 1.0
 			--[[
 				Do not tweak this unless you know what you're doing
 				start_x is where the FIRST rendered block lies
@@ -85,7 +85,7 @@ teamStats.config = {
 		ct_hudtxt = {
 			show = true,
 			id = 44, -- hudtxt ID
-			text = "Counter-Terrorists",
+			text = "Survivors",
 			color = "\169230230230", -- \169rrggbb
 			x = 130,
 			y = 62,
@@ -94,7 +94,7 @@ teamStats.config = {
 		tt_hudtxt = {
 			show = true,
 			id = 45, -- hudtxt ID
-			text = "Terrorists",
+			text = "Zombies",
 			color = "\169230230230", -- rrggbb
 			x = 435,
 			y = 62,
@@ -159,6 +159,15 @@ teamStats.config = {
 		},
 	},
 }
+--[[
+	Constants/CS2D Variables
+]]
+teamStats.const = {
+	gameModes = {
+		ct = {30, 2, 11, 21, 22, 31, 41, 61}, -- cts win these modes
+		tt = {1, 10, 12, 20, 40, 50, 60}, -- tts win these modes
+	},
+}
 
 --[[
 	Initialization
@@ -180,6 +189,7 @@ teamStats.vars = {
 	tt_percentile = 0,
 	round = 0,
 	showTimeCount = 0,
+	resetCall = false,
 }
 
 
@@ -239,6 +249,16 @@ function teamStats.second()
 end
 
 function teamStats.render()
+print('round: '..teamStats.vars.round)
+print('ct: '..teamStats.vars.ct)
+print('tt: '..teamStats.vars.tt)
+print('ct percentile: '..teamStats.vars.ct_percentile)
+print('tt percentile: '..teamStats.vars.tt_percentile)
+	if teamStats.vars.resetCall then
+		teamStats.reset()
+		teamStats.free()
+		teamStats.vars.resetCall = false
+	end
 	if teamStats.config.render then
 		if teamStats.vars.ct > 0 or teamStats.vars.tt > 0 then
 			teamStats.UI.showing = true
@@ -304,27 +324,42 @@ end
 
 function teamStats.roundend(mode)
 	if teamStats.config.roundLimit > 0 then
+		print('LIMITED ROUNDS MODE')
 		teamStats.vars.round = teamStats.vars.round + 1
-		if mode == 1 or mode == 20 then
-			if teamStats.vars.round <= teamStats.config.roundLimit then
-				teamStats.vars.tt = teamStats.vars.tt + 1
-			else
-				teamStats.reset()
+		if teamStats.vars.round <= teamStats.config.roundLimit then
+			for _,gm in pairs(teamStats.const.gameModes.ct) do
+				if gm == mode then
+					teamStats.vars.ct = teamStats.vars.ct + 1
+					print('CT++')
+					break
+				end
 			end
-		elseif mode == 2 or mode == 21 then
-			if teamStats.vars.round <= teamStats.config.roundLimit then
+			for _,gm in pairs(teamStats.const.gameModes.tt) do
+				if gm == mode then
+					teamStats.vars.tt = teamStats.vars.tt + 1
+					print('TT++')
+					break
+				end
+			end
+		else teamStats.vars.resetCall = true end
+	else
+		print('INFINITE ROUNDS MODE')
+		for _,gm in pairs(teamStats.const.gameModes.ct) do
+			if gm == mode then
 				teamStats.vars.ct = teamStats.vars.ct + 1
-			else
-				teamStats.reset()
+				print('CT++')
+				break
 			end
 		end
-	else
-		if mode == 1 or mode == 20 then
-			teamStats.vars.tt = teamStats.vars.tt + 1
-		elseif mode == 2 or mode == 21 then
-			teamStats.vars.ct = teamStats.vars.ct + 1
+		for _,gm in pairs(teamStats.const.gameModes.tt) do
+			if gm == mode then
+				teamStats.vars.tt = teamStats.vars.tt + 1
+				print('TT++')
+				break
+			end
 		end
 	end
+	-- Round End Calls/Updates
 	teamStats.calculatePercentile()
 	teamStats.vars.showTimeCount = 0
 	teamStats.UI.showing = false
@@ -334,10 +369,12 @@ end
 	Module Functions
 ]]
 function teamStats.reset()
+	print('Reset!')
 	teamStats.vars.ct = 0
 	teamStats.vars.tt = 0
-	teamStats.ct_percentile = 0
-	teamStats.tt_percentile = 0
+	teamStats.vars.ct_percentile = 0
+	teamStats.vars.tt_percentile = 0
+	teamStats.vars.round = 0
 end
 function teamStats.calculatePercentile()
 	local total = teamStats.vars.ct + teamStats.vars.tt

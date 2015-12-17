@@ -1,4 +1,4 @@
-# Team Wins HUD  (version 0.1) #
+# Team Wins HUD  (version 0.2) #
 
 A pretty cool HUD.
 Read more [here](http://www.unrealsoftware.de/files_show.php?file=16778)
